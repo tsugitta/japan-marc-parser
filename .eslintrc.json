@@ -1,0 +1,28 @@
+{
+  "extends": ["plugin:@typescript-eslint/recommended", "prettier"],
+  "plugins": ["import", "unused-imports"],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "ignoreRestSiblings": true
+      }
+    ],
+    "import/order": [
+      "warn",
+      {
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        },
+        "newlines-between": "always",
+        "groups": ["builtin", "external", "internal", ["parent", "sibling"], "object", "type", "index"]
+      }
+    ],
+    "unused-imports/no-unused-imports": "error",
+    "no-unreachable": "error",
+    "prefer-template": "error",
+    "@typescript-eslint/no-non-null-assertion": "off"
+  }
+}

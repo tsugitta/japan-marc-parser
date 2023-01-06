@@ -1,0 +1,46 @@
+name: "Crawl manually"
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "JAPAN/MARCデータページに記載されている対象の提供日を YYYY-MM-DD 形式で入力"
+        required: true
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16.x"
+          cache: "yarn"
+          cache-dependency-path: yarn.lock
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        id: node_modules_cache_id
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+            ${{ runner.os }}-
+
+      - name: Install dependencies
+        if: ${{ steps.node_modules_cache_id.outputs.cache-hit != 'true' }}
+        run: yarn --check-files --frozen-lockfile --non-interactive
+
+      - name: Crawl
+        run: yarn ts-node scripts/crawl/crawl.ts
+        env:
+          TARGET_DATE: ${{ github.event.inputs.date }}
